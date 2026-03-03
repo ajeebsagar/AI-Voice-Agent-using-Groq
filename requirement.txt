@@ -1,0 +1,1 @@
+#conda activate D:\All_project\ai-agents\venv

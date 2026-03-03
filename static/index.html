@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voice Agent — AI Voice Assistant</title>
+    <meta name="description" content="Real-time AI voice assistant with push-to-talk. Speak naturally and get instant voice responses.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="bg-gradient"></div>
+    <div class="particles" id="particles"></div>
+
+    <main class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="logo">
+                <span class="logo-icon">🎙️</span>
+                <h1>Voice Agent</h1>
+            </div>
+            <p class="subtitle">Your AI voice assistant — push to talk</p>
+        </header>
+
+        <!-- Main Voice Card -->
+        <div class="voice-card">
+            <!-- Orb Visualization -->
+            <div class="orb-container" id="orbContainer">
+                <div class="orb" id="orb">
+                    <div class="orb-inner"></div>
+                    <div class="orb-ring ring-1"></div>
+                    <div class="orb-ring ring-2"></div>
+                    <div class="orb-ring ring-3"></div>
+                </div>
+                <canvas id="waveCanvas" width="300" height="300"></canvas>
+            </div>
+
+            <!-- Status Text -->
+            <div class="status-area">
+                <p class="status-text" id="statusText">Press and hold to speak</p>
+                <div class="transcript-area" id="transcriptArea">
+                    <div class="transcript-row" id="userTranscript" style="display: none;">
+                        <span class="transcript-label">You</span>
+                        <p class="transcript-text" id="userText"></p>
+                    </div>
+                    <div class="transcript-row" id="aiTranscript" style="display: none;">
+                        <span class="transcript-label ai">AI</span>
+                        <p class="transcript-text" id="aiText"></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Push-to-Talk Button -->
+            <div class="ptt-wrapper">
+                <button class="ptt-button" id="pttButton" aria-label="Push to talk">
+                    <svg class="mic-icon" id="micIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+                        <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+                        <line x1="12" y1="19" x2="12" y2="23"/>
+                        <line x1="8" y1="23" x2="16" y2="23"/>
+                    </svg>
+                    <svg class="stop-icon hidden" id="stopIcon" viewBox="0 0 24 24" fill="currentColor">
+                        <rect x="4" y="4" width="16" height="16" rx="2"/>
+                    </svg>
+                    <div class="ptt-pulse"></div>
+                    <div class="ptt-pulse delay"></div>
+                </button>
+                <p class="ptt-hint" id="pttHint">Hold <kbd>Space</kbd> or click</p>
+            </div>
+        </div>
+
+        <!-- Connection Status -->
+        <div class="connection-bar" id="connectionBar">
+            <span class="connection-dot" id="connectionDot"></span>
+            <span class="connection-text" id="connectionText">Connecting...</span>
+        </div>
+    </main>
+
+    <script src="/static/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,11 @@
+# https://render.com/docs/blueprint-spec
+services:
+  - type: web
+    name: voice-agent
+    runtime: docker
+    plan: free
+    envVars:
+      - key: GROQ_API_KEY
+        sync: false  # Render will prompt you to enter this manually
+      - key: PORT
+        value: 7860
