@@ -102,7 +102,25 @@ async def voice_endpoint(websocket: WebSocket):
 
             # 2. Speech-to-Text (runs in thread pool to not block event loop)
             loop = asyncio.get_event_loop()
-            transcript = await loop.run_in_executor(None, transcribe, audio_bytes)
+            try:
+                transcript = await asyncio.wait_for(
+                    loop.run_in_executor(None, transcribe, audio_bytes),
+                    timeout=60.0  # 60-second timeout for Render's free CPU
+                )
+            except asyncio.TimeoutError:
+                print("[WS] STT timed out!")
+                await websocket.send_json({
+                    "type": "error",
+                    "message": "Transcription timed out. Please try a shorter recording."
+                })
+                continue
+            except Exception as e:
+                print(f"[WS] STT error: {e}")
+                await websocket.send_json({
+                    "type": "error",
+                    "message": "Transcription failed. Please try again."
+                })
+                continue
 
             if not transcript:
                 await websocket.send_json({

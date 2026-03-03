@@ -1,12 +1,13 @@
 """Speech-to-Text module using faster-whisper (runs on CPU)."""
 
-import io
 import tempfile
 import os
+import traceback
 from faster_whisper import WhisperModel
 
-# Use 'base' model — good accuracy, fast on CPU (~150 MB download on first run)
-MODEL_SIZE = "base"
+# Use 'tiny' model — lightweight, works on Render free tier (~75 MB)
+# Switch to 'base' for better accuracy if you have more RAM
+MODEL_SIZE = os.getenv("WHISPER_MODEL", "tiny")
 
 _model = None
 
@@ -29,19 +30,39 @@ def transcribe(audio_bytes: bytes) -> str:
         audio_bytes: Raw audio file bytes (webm, wav, mp3, etc.)
 
     Returns:
-        Transcribed text string.
+        Transcribed text string, or empty string on failure.
     """
+    if not audio_bytes or len(audio_bytes) < 100:
+        print("[STT] Audio too short, skipping.")
+        return ""
+
     model = get_model()
 
     # Write audio bytes to a temp file (faster-whisper needs a file path)
-    with tempfile.NamedTemporaryFile(suffix=".webm", delete=False) as tmp:
-        tmp.write(audio_bytes)
-        tmp_path = tmp.name
-
+    tmp_path = None
     try:
-        segments, info = model.transcribe(tmp_path, beam_size=5, language="en")
+        with tempfile.NamedTemporaryFile(suffix=".webm", delete=False) as tmp:
+            tmp.write(audio_bytes)
+            tmp_path = tmp.name
+
+        segments, info = model.transcribe(
+            tmp_path,
+            beam_size=1,       # faster, less memory
+            language="en",
+            vad_filter=True,   # skip silence for speed
+        )
         text = " ".join(segment.text.strip() for segment in segments)
-        print(f"[STT] Transcribed: {text}")
+        print(f"[STT] Transcribed ({info.duration:.1f}s audio): {text}")
         return text.strip()
+
+    except Exception as e:
+        print(f"[STT] Error during transcription: {e}")
+        traceback.print_exc()
+        return ""
+
     finally:
-        os.unlink(tmp_path)
+        if tmp_path and os.path.exists(tmp_path):
+            try:
+                os.unlink(tmp_path)
+            except:
+                pass
